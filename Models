@@ -1,0 +1,78 @@
+# Importing
+import pandas as pd
+import numpy as np
+import sklearn as skl
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+# Reading in the data
+data = pd.read_csv('/users/kristiandampedersen/documents/mobile_ml_proj/data/train.csv')
+test = pd.read_csv('/users/kristiandampedersen/documents/mobile_ml_proj/data/test.csv')
+
+# Defining our targets and predictors
+from sklearn.model_selection import train_test_split
+X = data.drop('price_range', axis=1)
+y = data['price_range']
+X_train, x_val, y_train, y_val = train_test_split(X, y, random_state=1)
+
+# Creating a decision tree classifier
+# Defining the model
+from sklearn.tree import DecisionTreeClassifier
+simple_model = DecisionTreeClassifier(random_state=1)
+#model fit
+simple_model.fit(X_train, y_train)
+# Measuring fit
+from sklearn.metrics import accuracy_score
+y_true = y_val
+y_pred = simple_model.predict(x_val)
+a_score = accuracy_score(y_true, y_pred)
+print(a_score)
+#Experimenting with depth
+list_a_scores=[]
+nr_leafs = [i for i in range(2,5000)]
+def getascore (max_leaf_nodes, X_train, x_val, y_train, y_val):
+    simple_model2 = DecisionTreeClassifier(max_leaf_nodes=max_leaf_nodes, random_state=1)
+    simple_model2.fit(X_train, y_train)
+    preds_val = simple_model2.predict(x_val)
+    a_score = accuracy_score(y_val, preds_val)
+    return(a_score)
+
+for max_leaf_nodes in range(2,5000):
+    my_a_score = getascore(max_leaf_nodes, X_train, x_val, y_train, y_val)
+    list_a_scores.append(my_a_score)
+# Making it readable
+a_score_table = {'Accuracy scores': list_a_scores, 'Nr of leafs': nr_leafs}
+df_accuracy = pd.DataFrame(data=a_score_table)
+df2 = df_accuracy.sort_values(by='Accuracy scores', ascending=False)
+print(df2.head(10))
+
+#Creating a randomforestclassifier
+# Same as above.
+from sklearn.ensemble import RandomForestClassifier
+simple_forest = RandomForestClassifier(random_state=1)
+simple_forest.fit(X_train,y_train)
+
+# Evaluating our model
+y_pred = simple_forest.predict(x_val)
+a_score = accuracy_score(y_pred, y_val)
+print(a_score)
+# Creating our "buckets" and our functions
+rf_list_scores = []
+rf_nr_leaves = [i for i in range(2,5000)]
+
+def getascorerf(max_leaf_nodes, X_train, x_val, y_train, y_val):
+    rf_model = RandomForestClassifier(max_leaf_nodes=max_leaf_nodes, random_state=1)
+    rf_model.fit(X_train, y_train)
+    pred_value = rf_model.predict(x_val)
+    score = accuracy_score(pred_value, y_val)
+    return score
+
+for max_leaf_nodes in range(2,5000):
+    myscore = getascorerf(max_leaf_nodes, X_train, x_val, y_train, y_val)
+    rf_list_scores.append(myscore)
+
+# Creating our dataframe
+rf_data = {'Accuracy': rf_list_scores, 'Nr of leaves': rf_nr_leaves}
+df_rfresults = pd.DataFrame(data=rf_data)
+df_randomresults = df_rfresults.sort_values(by='Accuracy', ascending=False)
+print(df_randomresults.head())
