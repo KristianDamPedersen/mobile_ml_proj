@@ -6,4 +6,6 @@ er
 "Mobile Price Classification" submitted by Abhishek Sharma
 https://www.kaggle.com/iabhishekofficial/mobile-price-classification
 
-## Sources used:
+## Problems and sources used:
+1) Ran into issue dropping "price_range" from the variable list. Found solution at:https://www.shanelynn.ie/using-pandas-dataframe-creating-editing-viewing-data-in-python/
+
